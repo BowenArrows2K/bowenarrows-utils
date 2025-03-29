@@ -1,4 +1,4 @@
-const fetch = require("node-fetch");
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 const version = process.env.RELEASE_VERSION; // e.g., "0.0.2"
 const [owner, repo] = process.env.REPO.split('/');
