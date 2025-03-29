@@ -25,4 +25,4 @@ jobs:
           FOUNDRY_API_TOKEN: ${{ secrets.FOUNDRY_API_TOKEN }}
           RELEASE_VERSION: ${{ github.event.release.tag_name }}
           REPO: ${{ github.repository }}
-        run: node publish.js
+        run: node .github/publish.js
