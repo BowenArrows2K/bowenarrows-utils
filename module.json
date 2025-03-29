@@ -16,5 +16,17 @@
   "manifest": "https://raw.githubusercontent.com/BowenArrows2K/bowenarrows-utils/main/module.json",
   "download": "https://github.com/BowenArrows2K/bowenarrows-utils/archive/main.zip",
   "esmodules": ["scripts/main.js", "scripts/universal-listener.js"],
-  "socket": true
+  "socket": true,
+  "relationships": {
+    "systems": [
+      {
+        "id": "dnd5e",
+        "type": "system",
+        "compatibility": {
+          "minimum": "4.3.7",
+          "verified": "4.3.7"
+        }
+      }
+    ]
+  }
 }
