@@ -13,6 +13,8 @@
     "verified": "12"
   },
   "url": "https://github.com/BowenArrows2K/bowenarrows-utils",
+  "manifest": "https://raw.githubusercontent.com/BowenArrows2K/bowenarrows-utils/refs/heads/main/module.json",
+  "download": "https://github.com/BowenArrows2K/bowenarrows-utils/archive/main.zip",
   "esmodules": ["scripts/main.js", "scripts/universal-listener.js"],
   "socket": true
 }
