@@ -93,7 +93,6 @@ export default class PartyMembersAppV2 extends ApplicationV2 {
       #party-members-app .health-container {
         position: relative;
         display: inline-block;
-        padding: 0 20px;
         box-sizing: content-box;
       }
       #party-members-app .healthbar {
@@ -249,7 +248,7 @@ export default class PartyMembersAppV2 extends ApplicationV2 {
 
       const hpText = `<input class="hp-input" id="hp-input-${member.id}" style="max-width: ${(`${hp.value}`.length * 10)}px;" type="string" max="${hp.max}" value="${hp.value}"></input>/${hp.max}`;
       const tempText = hp.temp > 0 ? ` <span class=\"temp-hp\">(+${hp.temp})</span>` : "";
-      const textWidth = (hp.value +"/"+ hp.max + tempText).length * 8 + 40;
+      const textWidth = (hp.value +"/"+ hp.max).length * 8 + 50;
       const totalHP = hp.max + (hp.temp || 0);
       const hpPercent = (hp.value / totalHP) * 100;
       const tempPercent = ((hp.temp || 0) / totalHP) * 100;
@@ -265,7 +264,7 @@ export default class PartyMembersAppV2 extends ApplicationV2 {
           <td>${classes}</td>
           <td>${background.name}</td>
           <td>
-            <div class="health-container" style="min-width: ${textWidth}px;">
+            <div class="health-container" style="min-width: ${(textWidth * 2)}px;">
               <div class="healthbar" style="background: ${barGradient};"></div>
               <div class="health-label">${hpText}${tempText}</div>
             </div>
