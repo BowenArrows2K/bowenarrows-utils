@@ -70,7 +70,7 @@ export default class PartyMembersApp extends ApplicationV2 {
     return super.close(options);
   }
 
-  async _renderHTML(data) {
+  async _renderHTML() {
     const container = document.createElement("div");
     container.classList.add("party-members-v2");
 
