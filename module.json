@@ -8,14 +8,14 @@
       "discord": "bowenarrows"
     }
   ],
-  "version": "0.0.1",
+  "version": "0.0.2",
   "compatibility": {
     "minimum": "12",
     "verified": "12"
   },
   "url": "https://github.com/BowenArrows2K/bowenarrows-utils",
-  "manifest": "https://github.com/BowenArrows2K/bowenarrows-utils/releases/download/0.0.1/module.json",
-  "download": "https://github.com/BowenArrows2K/bowenarrows-utils/releases/download/0.0.1/bowenarrows-utils.zip",
+  "manifest": "https://github.com/BowenArrows2K/bowenarrows-utils/releases/download/0.0.2/module.json",
+  "download": "https://github.com/BowenArrows2K/bowenarrows-utils/releases/download/0.0.2/bowenarrows-utils.zip",
   "readme": "https://github.com/BowenArrows2K/bowenarrows-utils/blob/main/README.md",
   "esmodules": ["scripts/main.js", "scripts/universal-listener.js"],
   "socket": true,
