@@ -1,0 +1,18 @@
+{
+  "id": "bowenarrows-utils",
+  "title": "BowenArrows Utils",
+  "description": "A collection of useful tools for D&D 5e",
+  "authors": [
+    {
+      "name": "BowenArrows"
+    }
+  ],
+  "version": "0.0.1",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "12"
+  },
+  "esmodules": ["scripts/main.js", "scripts/universal-listener.js"],
+  "socket": true,
+  "url": "https://github.com/BowenArrows2K/bowenarrows-utils"
+}
