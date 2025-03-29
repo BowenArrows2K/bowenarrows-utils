@@ -4,7 +4,8 @@
   "description": "A collection of useful tools for D&D 5e",
   "authors": [
     {
-      "name": "BowenArrows"
+      "name": "BowenArrows",
+      "discord": "bowenarrows"
     }
   ],
   "version": "0.0.1",
