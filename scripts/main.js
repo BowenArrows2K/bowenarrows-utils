@@ -2,22 +2,14 @@ import PartyMembersAppV2 from "./party-listv2.js";
 import CurrencySpenderApp from "./currency-calcv2.js";
 
 let currentCurrencyApp = null;
-function toggleCurrencySpender() {
-    if (currentCurrencyApp?.rendered) {
-        currentCurrencyApp.close();
-    } else {
-        currentCurrencyApp = new CurrencySpenderApp();
-        currentCurrencyApp.render(true);
-    }
-}
-
 let currentPartyApp = null;
-function togglePartyList() {
-    if (currentPartyApp?.rendered) {
-        currentPartyApp.close();
+
+function toggleApp(app, appType) {
+    if (app?.rendered) {
+        app.close();
     } else {
-        currentPartyApp = new PartyMembersAppV2();
-        currentPartyApp.render(true);
+        app = new appType();
+        app.render(true);
     }
 }
 
@@ -27,13 +19,13 @@ const showButtons = () => {
         id: 'currency-spender-button',
         dataTooltip: 'Currency Spender',
         icon: 'fa-coins',
-        onclick: () => toggleCurrencySpender()
+        onclick: () => toggleApp(currentCurrencyApp, CurrencySpenderApp)
     },
     {
         id: 'party-list-button',
         dataTooltip: 'Party List',
         icon: 'fa-users',
-        onclick: () => togglePartyList()
+        onclick: () => toggleApp(currentPartyApp, PartyMembersAppV2)
     }
     ];
     for (const button of buttons) {
