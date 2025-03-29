@@ -1,5 +1,5 @@
-import PartyMembersAppV2 from "./party-listv2.js";
-import CurrencySpenderApp from "./currency-calcv2.js";
+import PartyMembersApp from "./party-list.js";
+import CurrencySpenderApp from "./currency-calc.js";
 
 let currentCurrencyApp = null;
 let currentPartyApp = null;
@@ -25,7 +25,7 @@ const showButtons = () => {
         id: 'party-list-button',
         dataTooltip: 'Party List',
         icon: 'fa-users',
-        onclick: () => toggleApp(currentPartyApp, PartyMembersAppV2)
+        onclick: () => toggleApp(currentPartyApp, PartyMembersApp)
     }
     ];
     for (const button of buttons) {
