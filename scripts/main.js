@@ -22,26 +22,31 @@ function togglePartyList() {
 }
 
 const showButtons = () => {
-    const CoinSpenderButton = document.createElement("li");
-    CoinSpenderButton.id = "currency-spender-button";
-    CoinSpenderButton.setAttribute("data-tool", "CurrencySpender");
-    CoinSpenderButton.setAttribute("data-tooltip", "Currency Spender");
-    CoinSpenderButton.setAttribute("aria-label", "Show Currency Spender");
-    CoinSpenderButton.innerHTML = `<i class="fas fa-coins"></i>`;
-    CoinSpenderButton.onclick = () => toggleCurrencySpender();
-
-    const PartyListButton = document.createElement("li");
-    PartyListButton.id = "party-list-button";
-    PartyListButton.setAttribute("data-tool", "PartyList");
-    PartyListButton.setAttribute("data-tooltip", "Party List");
-    PartyListButton.setAttribute("aria-label", "Show Party List");
-    PartyListButton.innerHTML = `<i class="fas fa-users"></i>`;
-    PartyListButton.onclick = () => togglePartyList();
-
+    const buttons = [
+    {
+        id: 'currency-spender-button',
+        dataTooltip: 'Currency Spender',
+        icon: 'fa-coins',
+        onclick: () => toggleCurrencySpender()
+    },
+    {
+        id: 'party-list-button',
+        dataTooltip: 'Party List',
+        icon: 'fa-users',
+        onclick: () => togglePartyList()
+    }
+    ];
+    for (const button of buttons) {
+    const li = document.createElement('li');
+    li.id = button.id;
+    li.setAttribute('data-tooltip', button.dataTooltip);
+    li.setAttribute('aria-label', `Show ${button.dataTooltip}`);
+    li.setAttribute('data-tool', button.dataTooltip.replace(' ', ''));
+    li.innerHTML = `<i class="fas ${button.icon}"></i>`;
+    li.onclick = button.onclick;
     const controls = document.getElementById("tools-panel-token");
-    controls.appendChild(CoinSpenderButton);
-    controls.appendChild(PartyListButton);
-
+    controls.appendChild(li);
+    }
 }
 
 Hooks.on("init", () => {
