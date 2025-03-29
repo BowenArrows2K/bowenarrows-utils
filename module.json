@@ -12,7 +12,7 @@
     "minimum": "12",
     "verified": "12"
   },
+  "url": "https://github.com/BowenArrows2K/bowenarrows-utils",
   "esmodules": ["scripts/main.js", "scripts/universal-listener.js"],
-  "socket": true,
-  "url": "https://github.com/BowenArrows2K/bowenarrows-utils"
+  "socket": true
 }
