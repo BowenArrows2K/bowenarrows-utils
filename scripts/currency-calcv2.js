@@ -161,6 +161,11 @@ export default class CurrencySpenderApp extends ApplicationV2 {
       .map(([k, v]) => `${v} ${k}`)
       .join(", ");
 
+    const balanceMsg = Object.entries(wallet)
+      .filter(([, v]) => v > 0)
+      .map(([k, v]) => `${v} ${k}`)
+      .join(", ");    
+    
     const baseMessage = `
       <hr>
       <div style="font-size: 0.95em; line-height: 1.4;">
@@ -173,11 +178,13 @@ export default class CurrencySpenderApp extends ApplicationV2 {
           <div><strong>Deducting:</strong> <span style="color: red;">${spentMsg}</span></div>
           <div><strong>Change:</strong> <span style="color: aqua;">${changeMsg}</span></div>
           <div><strong>Purchase Value:</strong> <span style="color: limegreen;">${purchaseVal}</span></div>
+          <div><strong>Remaining:</strong> ${balanceMsg}</div>
           <div style="margin-top: 0.5em;"><strong style="color: green;">✔ Sufficient Funds</strong></div>`
           : `<div><strong>Total:</strong> <span style="color: rgb(244 199 56);">${amount.toFixed(2)} ${coinType}</span></div>
           <div><strong>Deducting:</strong> <span style="color: red;">${spentMsg}</span></div>
           ${(changeMsg !== "No change returned.") ?`<div><strong>Change:</strong> <span style="color: blue;">${changeMsg}</span></div>` : ""}
-          <div><strong>Purchase Value:</strong> <span style="color: forestgreen;">${purchaseVal}</span></div>`
+          <div><strong>Purchase Value:</strong> <span style="color: forestgreen;">${purchaseVal}</span></div>
+          <div><strong>Remaining:</strong> ${balanceMsg}</div>`
         }
       </div>
     `;
