@@ -228,6 +228,10 @@ export default class PartyMembersApp extends ApplicationV2 {
     outer.appendChild(inner);
   }
 
+  /**
+   * Updates the party list.
+   * @param {HTMLElement} container The container element to update.
+  */
   #updatePartyList(container) {
     const tbody = container.querySelector("#party-list");
     const updatedParty = this.partyMembers;
