@@ -15,7 +15,6 @@ function toggleApp(app, appType) {
 
 let buttonsCreated = false;
 const showButtons = () => {
-    if (buttonsCreated) return;
     const buttons = [
     {
         id: 'currency-spender-button',
@@ -31,6 +30,7 @@ const showButtons = () => {
     }
     ];
     for (const button of buttons) {
+    if (document.getElementById(button.id)) continue;
     const li = document.createElement('li');
     li.id = button.id;
     li.setAttribute('data-tooltip', button.dataTooltip);
@@ -41,7 +41,6 @@ const showButtons = () => {
     const controls = document.getElementById("tools-panel-token");
     controls.appendChild(li);
     }
-    buttonsCreated = true;
 }
 
 Hooks.on("init", () => {
