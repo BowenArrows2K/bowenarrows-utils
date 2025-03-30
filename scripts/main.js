@@ -7,9 +7,11 @@ let currentPartyApp = null;
 function toggleApp(app, appType) {
     if (app?.rendered) {
         app.close();
+        return null;
     } else {
         app = new appType();
         app.render(true);
+        return app;
     }
 }
 
@@ -30,13 +32,13 @@ const showButtons = () => {
         id: 'currency-spender-button',
         dataTooltip: 'Currency Spender',
         icon: 'fa-coins',
-        onclick: () => toggleApp(currentCurrencyApp, CurrencySpenderApp)
+        onclick: () => currentCurrencyApp = toggleApp(currentCurrencyApp, CurrencySpenderApp)
     },
     {
         id: 'party-list-button',
         dataTooltip: 'Party List',
         icon: 'fa-users',
-        onclick: () => toggleApp(currentPartyApp, PartyMembersApp)
+        onclick: () => currentPartyApp =toggleApp(currentPartyApp, PartyMembersApp)
     }
     ];
     for (const button of buttons) {

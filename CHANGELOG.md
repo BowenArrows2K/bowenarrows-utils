@@ -1,5 +1,6 @@
 # Next up
 
+- Fix toggleApp Function
 - Remove TS Console Logs
 
 # v 0.0.4
