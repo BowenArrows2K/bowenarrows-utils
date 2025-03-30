@@ -20,6 +20,7 @@ const registerSettings = () => {
         "name": "Player Currency Spender",
         "hint": "Allow players to use the Currency Spender app",
         "scope": "world",
+        "requiresReload": true,
         "config": true,
         "type": Boolean,
         "default": true
@@ -28,6 +29,7 @@ const registerSettings = () => {
         "name": "Player Party List",
         "hint": "Allow players to use the Party List app",
         "scope": "world",
+        "requiresReload": true,
         "config": true,
         "type": Boolean,
         "default": true
