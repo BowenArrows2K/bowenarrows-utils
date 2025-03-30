@@ -1,6 +1,4 @@
-const { ApplicationV2 } = foundry.applications.api;
-
-export default class PartyMembersApp extends ApplicationV2 {
+export default class PartyMembersApp extends foundry.applications.api.ApplicationV2 {
   constructor() {
     super();
     this._hookId = null;

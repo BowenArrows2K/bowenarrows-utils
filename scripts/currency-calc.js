@@ -1,6 +1,4 @@
-const { ApplicationV2 } = foundry.applications.api;
-
-export default class CurrencySpenderApp extends ApplicationV2 {
+export default class CurrencySpenderApp extends foundry.applications.api.ApplicationV2 {
   static DEFAULT_OPTIONS = {
     id: "currency-spender-app",
     classes: ["sheet", "dnd5e2"],
