@@ -1,5 +1,7 @@
 # Next up
 
+# v 0.0.6
+
 - Moved styles to styles/*
 - Adjusted code order/formatting
 - Removed var defining ApplicationV2 as it can be referenced directly
