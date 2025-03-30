@@ -82,7 +82,6 @@ export default class CurrencySpenderApp extends ApplicationV2 {
         var valueTypes = ["cp", "sp", "gp", "pp"];
         if (roundedCost[type] === 0) continue;
         if (roundedCost[type] > wallet[type]) {
-          console.log(`Rounding ${type} to ${conv}`);
           if (type === "pp") {
             for (let type of valueTypes) {
               paid[type] = wallet[type];
@@ -96,7 +95,6 @@ export default class CurrencySpenderApp extends ApplicationV2 {
               wallet[valueTypes[i]] += paid[valueTypes[i]];
               paid[valueTypes[i]] = 0;
               roundedCost[valueTypes[i]] = 0;
-              console.log(`Setting ${valueTypes[i]} to 0`);
             };
             continue;
           }

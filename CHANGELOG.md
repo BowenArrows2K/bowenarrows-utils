@@ -1,5 +1,7 @@
 # Next up
 
+- Remove TS Console Logs
+
 # v 0.0.4
 
 - Config displayHPValue added
