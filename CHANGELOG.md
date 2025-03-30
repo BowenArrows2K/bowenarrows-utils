@@ -1,5 +1,7 @@
 # Next up
 
+# v 0.0.5
+
 - Config playerPartyApp & playerCurrencyApp added
   - Toggles if players can use the apps
 - Fix toggleApp Function
