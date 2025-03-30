@@ -12,7 +12,7 @@ const [owner, repo] = process.env.REPO.split('/');
     },
     body: JSON.stringify({
       id: "bowenarrows-utils", // Your actual Foundry module ID
-      "dry-run": true,
+      "dry-run": false,
       release: {
         version: version,
         manifest: `https://github.com/${owner}/${repo}/releases/download/${version}/module.json`,

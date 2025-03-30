@@ -1,4 +1,4 @@
-name: Publish to FoundryVTT (Dry Run)
+name: Publish to FoundryVTT
 
 on:
   release:
