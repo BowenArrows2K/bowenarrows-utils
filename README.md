@@ -5,7 +5,7 @@ A collection of useful tools for D&D 5e
 ## Installation
 
 1. Open the Add-on Modules tab in the Configuration and Setup dialog.
-2. Click Install Module and search for "Actor Attribute List", or use the following manifest URL: `https://raw.githubusercontent.com/BowenArrows2K/bowenarrows-utils/main/module.json`
+2. Click Install Module and search for "Actor Attribute List", or use the following manifest URL: `https://github.com/BowenArrows2K/bowenarrows-utils/releases/latest/download/module.json`
 3. Install the module and activate it for your World using the checkbox in the 'Manage Modules' Dialog.
 
 ## Usage
