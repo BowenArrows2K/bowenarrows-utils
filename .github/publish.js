@@ -2,7 +2,7 @@ const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fet
 
 const version = process.env.RELEASE_VERSION; // e.g., "0.0.2"
 const [owner, repo] = process.env.REPO.split('/');
-const changelogBlob = version.split('.').slice(0, 2).join('.'); // e.g., "002"
+const changelogBlob = version.split('.').join(''); // e.g., "002"
 
 (async () => {
   const response = await fetch("https://api.foundryvtt.com/_api/packages/release_version/", {
