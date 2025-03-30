@@ -1,0 +1,44 @@
+#currency-spender-body {
+    text-align: center;
+}
+
+#currency-spender-body input,
+#currency-spender-body button {
+    width: 100%;
+    padding: 0.5em;
+    font-size: 1em;
+    margin-top: 0.5em;
+}
+
+#currency-spender-body input {
+    color: #fff;
+}
+
+#currency-spender-body select {
+    text-align: center;
+}
+
+#currency-spender-body button {
+    color: rgb(244 199 56);
+    border: 1px solid #666;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+#currency-spender-body .amount-input {
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0.25rem;
+}
+
+#currency-spender-body .amount-input label,
+#currency-spender-body .amount-input input,
+#currency-spender-body .amount-input select {
+    margin: 0.25rem;
+}
+
+#currency-spender-body .currency-preview {
+    font-size: 0.95em;
+    text-align: center;
+}

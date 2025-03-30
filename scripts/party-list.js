@@ -164,90 +164,6 @@ export default class PartyMembersApp extends foundry.applications.api.Applicatio
     const container = document.createElement("div");
     container.classList.add("party-members-v2");
 
-    const style = document.createElement("style");
-    style.textContent = `
-      #party-members-app table {
-        margin: 0rem;
-        width: 100%;
-        border-collapse: collapse;
-      }
-      #party-members-app table th,
-      #party-members-app table td {
-        text-align: center;
-        padding: 0rem; !important
-      }
-      #party-members-app th {
-        border-bottom: 1px solid #888;
-        cursor: pointer;
-      }
-      #party-members-app .health-container {
-        position: relative;
-        display: inline-block;
-        box-sizing: content-box;
-      }
-      #party-members-app .healthbar {
-        width: 100%;
-        height: 16px;
-        border-radius: 4px;
-        overflow: hidden;
-      }
-      #party-members-app .health-label {
-        overflow: hidden;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        text-align: center;
-        font-size: 0.9em;
-        line-height: 16px;
-        font-weight: bold;
-        color: #fff;
-        text-shadow: 0 0 2px #000;
-        white-space: nowrap;
-      }
-      #party-members-app .temp-hp {
-        color: #00bfff;
-      }
-      #party-members-app .highlight-flash {
-        animation: flashHighlight 1.2s ease-out;
-      }
-      @keyframes flashHighlight {
-        0% {
-          background-color: #fff3cd;
-        }
-        100% {
-          background-color: transparent;
-        }
-      }
-      #party-members-app .portrait-img {
-        border-radius: 4px;
-        width: 32px;
-        height: 32px;
-        object-fit: cover;
-      }
-      #party-members-app .hp-input {
-        display: inline;
-        width: auto;
-        height: auto;
-        padding: 0;
-        margin: 0;
-        text-align: right;
-        border: none;
-        background: none;
-        font-size: 1em;
-        line-height: 16px;
-        font-weight: bold;
-        color: #fff;
-        text-shadow: 0 0 2px #000;
-      }
-      #party-members-app .clickable-name {
-        cursor: pointer;
-        color: var(--color-text-hyperlink);
-        text-decoration: underline;
-      }
-    `;
-
     const table = document.createElement("table");
     table.innerHTML = `
       <thead>
@@ -265,8 +181,6 @@ export default class PartyMembersApp extends foundry.applications.api.Applicatio
       </thead>
       <tbody id="party-list"></tbody>
     `;
-
-    container.appendChild(style);
 
     container.appendChild(table);
 

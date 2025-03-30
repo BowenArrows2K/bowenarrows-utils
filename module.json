@@ -18,6 +18,7 @@
     "verified": "12"
   },
   "esmodules": ["scripts/main.js", "scripts/universal-listener.js"],
+  "styles": ["styles/bowenarrows-utils.css"],
   "socket": true,
   "relationships": {
     "systems": [
