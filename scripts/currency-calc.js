@@ -32,14 +32,14 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
     super(merged);
   }
 
-  async getData(actor = game.user.character) {
+  async #getData(actor = game.user.character) {
     if (!actor) return {};
     const currency = actor.system?.currency ?? { cp: 0, sp: 0, gp: 0, pp: 0 };
     const totalGPValue = (currency.cp / 100 + currency.sp / 10 + currency.gp + currency.pp * 10).toFixed(2);
     return { currency, totalGPValue };
   }
 
-  _calculatePayment(html, amount, currency, source) {
+  #calculatePayment(html, amount, currency, source) {
     const values = { pp: 1000, gp: 100, sp: 10, cp: 1 };
     const wallet = foundry.utils.deepClone(currency);
     const coinType = html.querySelector("#currency-spender-denom-select option:checked").textContent;
@@ -196,14 +196,14 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
     };
   }
 
-  async _handleSpendGold(html) {
+  async #handleSpendGold(html) {
     const actor = game.user.isGM ? game.actors.get(html.querySelector("#currency-spender-character-select")?.value) : game.user.character;
     if (!actor) return ui.notifications.warn("You must have a linked character.");
 
     const amount = parseFloat(html.querySelector("#gold-amount")?.value);
     if (isNaN(amount) || amount <= 0) return ui.notifications.warn("Enter a valid amount.");
 
-    const result = this._calculatePayment(html, amount, actor.system?.currency ?? { cp: 0, sp: 0, gp: 0, pp: 0 }, "chat");
+    const result = this.#calculatePayment(html, amount, actor.system?.currency ?? { cp: 0, sp: 0, gp: 0, pp: 0 }, "chat");
 
     if (!result.success) {
       return ui.notifications.error("Insufficient funds.");
@@ -227,13 +227,26 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
 
   async #updateCurrencySpender(html, actor) {
     const status = html.querySelector("#currency-status");
-    const { currency, totalGPValue } = await this.getData(actor);
+    const { currency, totalGPValue } = await this.#getData(actor);
 
     status.innerHTML = `
         <strong>Current Funds:</strong><br />
         ${currency.pp} pp, ${currency.gp} gp, ${currency.sp} sp, ${currency.cp} cp<br />
         <strong>Total GP Value:</strong> ${totalGPValue} gp
     `;
+  }
+
+  async #updatePreview(html) {
+    const amount = parseFloat(html.querySelector("#gold-amount")?.value);
+    const previewDiv = html.querySelector("#deduction-preview");
+    if (isNaN(amount) || amount <= 0) return previewDiv.style.display = "none";
+
+    const actor = html.querySelector("#currency-spender-character-select")?.value ? game.actors.get(html.querySelector("#currency-spender-character-select")?.value) : game.user.character;
+    const currency = actor?.system.currency ?? { cp: 0, sp: 0, gp: 0, pp: 0 };
+    const result = this.#calculatePayment(html, amount, currency, "preview");
+
+    previewDiv.innerHTML = result.messageHTML;
+    previewDiv.style.display = "block";
   }
 
   async _renderHTML() {
@@ -245,7 +258,7 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
     );
     
     const actor = game.user.isGM === true ? members[0] : game.user.character;
-    const { currency, totalGPValue } = await this.getData(actor);
+    const { currency, totalGPValue } = await this.#getData(actor);
     if (!actor) return document.createElement("div");
     
     const charSelect = document.createElement("select");
@@ -330,12 +343,12 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
     let debounce;
     container.querySelector("#gold-amount").addEventListener("input", () => {
       clearTimeout(debounce);
-      debounce = setTimeout(() => this._updatePreview(container), 150);
+      debounce = setTimeout(() => this.#updatePreview(container), 150);
     });
 
     container.querySelector("#currency-spender-denom-select").addEventListener("change", () => {
       clearTimeout(debounce);
-      debounce = setTimeout(() => this._updatePreview(container), 150);
+      debounce = setTimeout(() => this.#updatePreview(container), 150);
     });
 
     if (game.user.isGM) {
@@ -346,25 +359,12 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
       });
     };
 
-    container.querySelector("button[data-action='spendGold']").addEventListener("click", () => this._handleSpendGold(container));
+    container.querySelector("button[data-action='spendGold']").addEventListener("click", () => this.#handleSpendGold(container));
     return container;
   }
 
   async _replaceHTML(inner, outer) {
     outer.innerHTML = "";
     outer.appendChild(inner);
-  }
-
-  async _updatePreview(html) {
-    const amount = parseFloat(html.querySelector("#gold-amount")?.value);
-    const previewDiv = html.querySelector("#deduction-preview");
-    if (isNaN(amount) || amount <= 0) return previewDiv.style.display = "none";
-
-    const actor = html.querySelector("#currency-spender-character-select")?.value ? game.actors.get(html.querySelector("#currency-spender-character-select")?.value) : game.user.character;
-    const currency = actor?.system.currency ?? { cp: 0, sp: 0, gp: 0, pp: 0 };
-    const result = this._calculatePayment(html, amount, currency, "preview");
-
-    previewDiv.innerHTML = result.messageHTML;
-    previewDiv.style.display = "block";
   }
 }

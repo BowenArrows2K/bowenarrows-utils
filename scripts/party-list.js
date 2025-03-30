@@ -1,13 +1,4 @@
 export default class PartyMembersApp extends foundry.applications.api.ApplicationV2 {
-  constructor() {
-    super();
-    this._hookId = null;
-    this._recentlyUpdatedId = null;
-    this._sortBy = "name";
-    this._sortDir = "asc";
-    this._debounceTimeout = null;
-  }
-
   static DEFAULT_OPTIONS = {
     id: "party-members-app",
     classes: ["sheet", "dnd5e2"],
@@ -26,6 +17,22 @@ export default class PartyMembersApp extends foundry.applications.api.Applicatio
       closeOnSubmit: false
     }
   };
+
+  constructor() {
+    super();
+    this._hookId = null;
+    this._recentlyUpdatedId = null;
+    this._sortBy = "name";
+    this._sortDir = "asc";
+    this._debounceTimeout = null;
+  }
+
+  // getData() { return {}; }
+
+  close(options) {
+    if (this._hookId) Hooks.off("updateActor", this._hookId);
+    return super.close(options);
+  }
 
   get partyMembers() {
     let members = game.actors.filter(actor =>
@@ -61,11 +68,98 @@ export default class PartyMembersApp extends foundry.applications.api.Applicatio
     }
   }
 
-  getData() { return {}; }
+  /**
+   * Updates the party list.
+   * @param {HTMLElement} container The container element to update.
+  */
+  #updatePartyList(container) {
+    const tbody = container.querySelector("#party-list");
+    const updatedParty = this.partyMembers;
 
-  close(options) {
-    if (this._hookId) Hooks.off("updateActor", this._hookId);
-    return super.close(options);
+    let totalGP = 0;
+
+    const partyHtml = updatedParty.map(member => {
+      const hp = member.system.attributes.hp;
+      const ac = member.system.attributes.ac?.value ?? "";
+      const passive = member.system.skills.prc.passive;
+      const inspiration = member.system.attributes?.inspiration ? "✨" : "○";
+      const classes = member.items.filter(i => i.type === "class").map(cls => `${cls.name} (${cls.system.levels})`).join(", ");
+      const background = member.system.details.background;
+      const currencies = member.system.currency;
+      const totalMemberGP = (currencies.pp * 10) + currencies.gp + (currencies.ep / 2) + (currencies.sp / 10) + (currencies.cp / 100);
+      totalGP += totalMemberGP;
+      const gpFormatted = totalMemberGP.toFixed(2);
+      
+      const isOwner = game.user.character?.id === member.id;
+      const displayHPValue = game.settings.get("bowenarrows-utils", "displayHPValue");
+      const hpText = `<input class="hp-input" id="hp-input-${member.id}" style="max-width: ${(`${hp.value}`.length * 10)}px;" type="string" max="${hp.max}" value="${hp.value}"></input>/${hp.max}`;
+      const tempText = hp.temp > 0 ? ` <span class=\"temp-hp\">(+${hp.temp})</span>` : "";
+      const textWidth = (hp.value +"/"+ hp.max).length * 8 + 50;
+      const totalHP = hp.max + (hp.temp || 0);
+      const hpPercent = (hp.value / totalHP) * 100;
+      const tempPercent = ((hp.temp || 0) / totalHP) * 100;
+      const healthColor = hpPercent > 66 ? 'green' : hpPercent > 33 ? 'orange' : 'red';
+      const barGradient = `linear-gradient(to right, ${healthColor} ${hpPercent}%, blue ${hpPercent}% ${hpPercent + tempPercent}%, #555 ${hpPercent + tempPercent}%)`;
+      const highlightClass = this._recentlyUpdatedId === member.id ? ` class="highlight-flash";` : "";
+
+      return `
+        <tr${highlightClass}>
+          <td><img src="${member.img}" class="portrait-img" alt="portrait"></td>
+          <td><span class="clickable-name" data-actor-id="${member.id}">${member.name}</span></td>
+          <td class="clickable-inspiration" data-actor-id="${member.id}">${inspiration}</td>
+          <td>${classes}</td>
+          <td>${background.name}</td>
+          <td>
+            <div class="health-container" style="min-width: ${(textWidth * 2)}px;">
+              <div class="healthbar" style="background: ${barGradient};"></div>
+              <div class="health-label"${displayHPValue ? "" : `${isOwner ? "" : `${game.user.isGM ? "" : " style=\"display: none;\""}`}`}>${hpText}${tempText}</div>
+            </div>
+          </td>
+          <td>${ac}</td>
+          <td>${passive}</td>
+          <td title="PP: ${currencies.pp}, GP: ${currencies.gp}, EP: ${currencies.ep}, SP: ${currencies.sp}, CP: ${currencies.cp}">
+            ${gpFormatted} gp
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    const totalRow = `
+      <tr>
+        <td colspan="8" style="text-align: right; font-weight: bold;">Total GP:</td>
+        <td style="font-weight: bold; padding: 0.5em;">${totalGP.toFixed(2)} gp</td>
+      </tr>
+    `;
+
+    tbody.innerHTML = partyHtml + totalRow;
+
+    container.querySelectorAll("input[id^=hp-input-]").forEach(input => {
+      input.addEventListener("change", (event) => {
+        const actor = game.actors.get(input.id.replace("hp-input-", ""));
+        if (event.target.value.charAt(0) === "-" || event.target.value.charAt(0) === "+") {
+          var currenthp = actor.system.attributes.hp.value
+          var finalHP = currenthp + parseInt(event.target.value)
+          actor.update({ "system.attributes.hp.value": parseInt(finalHP) });
+        } else {
+          var newHP = parseInt(event.target.value);
+          actor.update({ "system.attributes.hp.value": newHP });
+        }
+      });
+    });
+
+    container.querySelectorAll(".clickable-inspiration").forEach(el => {
+      el.addEventListener("click", () => {
+        const actor = game.actors.get(el.dataset.actorId);
+        if (actor) actor.update({ "system.attributes.inspiration": !actor.system.attributes.inspiration });
+      });
+    });
+
+    container.querySelectorAll(".clickable-name").forEach(el => {
+      el.addEventListener("click", () => {
+        const actor = game.actors.get(el.dataset.actorId);
+        if (actor) actor.sheet.render(true);
+      });
+    });
   }
 
   async _renderHTML() {
@@ -224,99 +318,5 @@ export default class PartyMembersApp extends foundry.applications.api.Applicatio
   async _replaceHTML(inner, outer) {
     outer.innerHTML = "";
     outer.appendChild(inner);
-  }
-
-  /**
-   * Updates the party list.
-   * @param {HTMLElement} container The container element to update.
-  */
-  #updatePartyList(container) {
-    const tbody = container.querySelector("#party-list");
-    const updatedParty = this.partyMembers;
-
-    let totalGP = 0;
-
-    const partyHtml = updatedParty.map(member => {
-      const hp = member.system.attributes.hp;
-      const ac = member.system.attributes.ac?.value ?? "";
-      const passive = member.system.skills.prc.passive;
-      const inspiration = member.system.attributes?.inspiration ? "✨" : "○";
-      const classes = member.items.filter(i => i.type === "class").map(cls => `${cls.name} (${cls.system.levels})`).join(", ");
-      const background = member.system.details.background;
-      const currencies = member.system.currency;
-      const totalMemberGP = (currencies.pp * 10) + currencies.gp + (currencies.ep / 2) + (currencies.sp / 10) + (currencies.cp / 100);
-      totalGP += totalMemberGP;
-      const gpFormatted = totalMemberGP.toFixed(2);
-      
-      const isOwner = game.user.character?.id === member.id;
-      const displayHPValue = game.settings.get("bowenarrows-utils", "displayHPValue");
-      const hpText = `<input class="hp-input" id="hp-input-${member.id}" style="max-width: ${(`${hp.value}`.length * 10)}px;" type="string" max="${hp.max}" value="${hp.value}"></input>/${hp.max}`;
-      const tempText = hp.temp > 0 ? ` <span class=\"temp-hp\">(+${hp.temp})</span>` : "";
-      const textWidth = (hp.value +"/"+ hp.max).length * 8 + 50;
-      const totalHP = hp.max + (hp.temp || 0);
-      const hpPercent = (hp.value / totalHP) * 100;
-      const tempPercent = ((hp.temp || 0) / totalHP) * 100;
-      const healthColor = hpPercent > 66 ? 'green' : hpPercent > 33 ? 'orange' : 'red';
-      const barGradient = `linear-gradient(to right, ${healthColor} ${hpPercent}%, blue ${hpPercent}% ${hpPercent + tempPercent}%, #555 ${hpPercent + tempPercent}%)`;
-      const highlightClass = this._recentlyUpdatedId === member.id ? ` class="highlight-flash";` : "";
-
-      return `
-        <tr${highlightClass}>
-          <td><img src="${member.img}" class="portrait-img" alt="portrait"></td>
-          <td><span class="clickable-name" data-actor-id="${member.id}">${member.name}</span></td>
-          <td class="clickable-inspiration" data-actor-id="${member.id}">${inspiration}</td>
-          <td>${classes}</td>
-          <td>${background.name}</td>
-          <td>
-            <div class="health-container" style="min-width: ${(textWidth * 2)}px;">
-              <div class="healthbar" style="background: ${barGradient};"></div>
-              <div class="health-label"${displayHPValue ? "" : `${isOwner ? "" : `${game.user.isGM ? "" : " style=\"display: none;\""}`}`}>${hpText}${tempText}</div>
-            </div>
-          </td>
-          <td>${ac}</td>
-          <td>${passive}</td>
-          <td title="PP: ${currencies.pp}, GP: ${currencies.gp}, EP: ${currencies.ep}, SP: ${currencies.sp}, CP: ${currencies.cp}">
-            ${gpFormatted} gp
-          </td>
-        </tr>
-      `;
-    }).join("");
-
-    const totalRow = `
-      <tr>
-        <td colspan="8" style="text-align: right; font-weight: bold;">Total GP:</td>
-        <td style="font-weight: bold; padding: 0.5em;">${totalGP.toFixed(2)} gp</td>
-      </tr>
-    `;
-
-    tbody.innerHTML = partyHtml + totalRow;
-
-    container.querySelectorAll("input[id^=hp-input-]").forEach(input => {
-      input.addEventListener("change", (event) => {
-        const actor = game.actors.get(input.id.replace("hp-input-", ""));
-        if (event.target.value.charAt(0) === "-" || event.target.value.charAt(0) === "+") {
-          var currenthp = actor.system.attributes.hp.value
-          var finalHP = currenthp + parseInt(event.target.value)
-          actor.update({ "system.attributes.hp.value": parseInt(finalHP) });
-        } else {
-          var newHP = parseInt(event.target.value);
-          actor.update({ "system.attributes.hp.value": newHP });
-        }
-      });
-    });
-
-    container.querySelectorAll(".clickable-inspiration").forEach(el => {
-      el.addEventListener("click", () => {
-        const actor = game.actors.get(el.dataset.actorId);
-        if (actor) actor.update({ "system.attributes.inspiration": !actor.system.attributes.inspiration });
-      });
-    });
-
-    container.querySelectorAll(".clickable-name").forEach(el => {
-      el.addEventListener("click", () => {
-        const actor = game.actors.get(el.dataset.actorId);
-        if (actor) actor.sheet.render(true);
-      });
-    });
   }
 }

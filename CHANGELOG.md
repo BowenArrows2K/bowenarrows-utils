@@ -1,5 +1,6 @@
 # Next up
 
+- Adjusted code order/formatting
 - Removed var defining ApplicationV2 as it can be referenced directly
 
 # v 0.0.5
