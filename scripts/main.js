@@ -16,6 +16,22 @@ function toggleApp(app, appType) {
 }
 
 const registerSettings = () => {
+    game.settings.register("bowenarrows-utils", "playerCurrencyApp", {
+        "name": "Player Currency Spender",
+        "hint": "Allow players to use the Currency Spender app",
+        "scope": "world",
+        "config": true,
+        "type": Boolean,
+        "default": true
+    })
+    game.settings.register("bowenarrows-utils", "playerPartyApp", {
+        "name": "Player Party List",
+        "hint": "Allow players to use the Party List app",
+        "scope": "world",
+        "config": true,
+        "type": Boolean,
+        "default": true
+    })
     game.settings.register("bowenarrows-utils", "displayHPValue", {
         "name": "Display HP Value",
         "hint": "Display HP value in the Party Members List for players",
@@ -30,12 +46,14 @@ const showButtons = () => {
     const buttons = [
     {
         id: 'currency-spender-button',
+        enabled: game.settings.get("bowenarrows-utils", "playerCurrencyApp"),
         dataTooltip: 'Currency Spender',
         icon: 'fa-coins',
         onclick: () => currentCurrencyApp = toggleApp(currentCurrencyApp, CurrencySpenderApp)
     },
     {
         id: 'party-list-button',
+        enabled: game.settings.get("bowenarrows-utils", "playerPartyApp"),
         dataTooltip: 'Party List',
         icon: 'fa-users',
         onclick: () => currentPartyApp =toggleApp(currentPartyApp, PartyMembersApp)
@@ -43,6 +61,7 @@ const showButtons = () => {
     ];
     for (const button of buttons) {
     if (document.getElementById(button.id)) continue;
+    if (!button.enabled && !game.user.isGM) continue;
     const li = document.createElement('li');
     li.id = button.id;
     li.setAttribute('data-tooltip', button.dataTooltip);

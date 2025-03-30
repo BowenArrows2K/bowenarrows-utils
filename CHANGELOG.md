@@ -1,5 +1,7 @@
 # Next up
 
+- Config playerPartyApp & playerCurrencyApp added
+  - Toggles if players can use the apps
 - Fix toggleApp Function
 - Remove TS Console Logs
 
