@@ -15,35 +15,45 @@ function toggleApp(app, appType) {
     }
 }
 
+/**
+ * Registers settings for the BowenArrows-Utils module.
+ * @function
+ */
 const registerSettings = () => {
     game.settings.register("bowenarrows-utils", "playerCurrencyApp", {
-        "name": "Player Currency Spender",
-        "hint": "Allow players to use the Currency Spender app",
-        "scope": "world",
-        "requiresReload": true,
-        "config": true,
-        "type": Boolean,
-        "default": true
+        name: "Player Currency Spender",
+        hint: "Allow players to use the Currency Spender app",
+        scope: "world",
+        requiresReload: true,
+        config: true,
+        type: Boolean,
+        default: true
     })
     game.settings.register("bowenarrows-utils", "playerPartyApp", {
-        "name": "Player Party List",
-        "hint": "Allow players to use the Party List app",
-        "scope": "world",
-        "requiresReload": true,
-        "config": true,
-        "type": Boolean,
-        "default": true
+        name: "Player Party List",
+        hint: "Allow players to use the Party List app",
+        scope: "world",
+        requiresReload: true,
+        config: true,
+        type: Boolean,
+        default: true
     })
     game.settings.register("bowenarrows-utils", "displayHPValue", {
-        "name": "Display HP Value",
-        "hint": "Display HP value in the Party Members List for players",
-        "scope": "world",
-        "config": true,
-        "type": Boolean,
-        "default": true
+        name: "Display HP Value",
+        hint: "Display HP value in the Party Members List for players",
+        scope: "world",
+        config: true,
+        type: Boolean,
+        default: true
     })
 }
 
+/**
+ * Show buttons for the Currency Spender and Party List apps in the game
+ * toolbar if the corresponding settings are enabled.
+ *
+ * @function
+ */
 const showButtons = () => {
     const buttons = [
     {
