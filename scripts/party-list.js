@@ -27,8 +27,6 @@ export default class PartyMembersApp extends foundry.applications.api.Applicatio
     this._debounceTimeout = null;
   }
 
-  // getData() { return {}; }
-
   close(options) {
     if (this._hookId) Hooks.off("updateActor", this._hookId);
     return super.close(options);
