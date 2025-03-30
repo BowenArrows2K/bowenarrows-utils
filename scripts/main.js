@@ -13,7 +13,17 @@ function toggleApp(app, appType) {
     }
 }
 
-let buttonsCreated = false;
+const registerSettings = () => {
+    game.settings.register("bowenarrows-utils", "displayHPValue", {
+        "name": "Display HP Value",
+        "hint": "Display HP value in the Party Members List for players",
+        "scope": "world",
+        "config": true,
+        "type": Boolean,
+        "default": true
+    })
+}
+
 const showButtons = () => {
     const buttons = [
     {
@@ -45,6 +55,8 @@ const showButtons = () => {
 
 Hooks.on("init", () => {
     console.log("Initializing BowenArrow's Utils");
+
+    registerSettings();
 });
 Hooks.on("ready", () => {
     console.log("BowenArrow's Utils Ready!");

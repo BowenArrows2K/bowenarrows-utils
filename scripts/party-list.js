@@ -245,7 +245,9 @@ export default class PartyMembersApp extends ApplicationV2 {
       const totalMemberGP = (currencies.pp * 10) + currencies.gp + (currencies.ep / 2) + (currencies.sp / 10) + (currencies.cp / 100);
       totalGP += totalMemberGP;
       const gpFormatted = totalMemberGP.toFixed(2);
-
+      
+      const isOwner = game.user.character?.id === member.id;
+      const displayHPValue = game.settings.get("bowenarrows-utils", "displayHPValue");
       const hpText = `<input class="hp-input" id="hp-input-${member.id}" style="max-width: ${(`${hp.value}`.length * 10)}px;" type="string" max="${hp.max}" value="${hp.value}"></input>/${hp.max}`;
       const tempText = hp.temp > 0 ? ` <span class=\"temp-hp\">(+${hp.temp})</span>` : "";
       const textWidth = (hp.value +"/"+ hp.max).length * 8 + 50;
@@ -266,7 +268,7 @@ export default class PartyMembersApp extends ApplicationV2 {
           <td>
             <div class="health-container" style="min-width: ${(textWidth * 2)}px;">
               <div class="healthbar" style="background: ${barGradient};"></div>
-              <div class="health-label">${hpText}${tempText}</div>
+              <div class="health-label"${displayHPValue ? "" : `${isOwner ? "" : `${game.user.isGM ? "" : " style=\"display: none;\""}`}`}>${hpText}${tempText}</div>
             </div>
           </td>
           <td>${ac}</td>

@@ -1,5 +1,7 @@
 # Next up
 
+- Config displayHPValue added
+
 # v 0.0.3
 
 - Double Buttons fix
