@@ -1,5 +1,9 @@
 # Next up
 
+# v 0.0.3
+
+- Double Buttons fix
+
 # v 0.0.2
 
 - Refactor Main.js to reduce code duplication.
