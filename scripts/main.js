@@ -13,7 +13,9 @@ function toggleApp(app, appType) {
     }
 }
 
+let buttonsCreated = false;
 const showButtons = () => {
+    if (buttonsCreated) return;
     const buttons = [
     {
         id: 'currency-spender-button',
@@ -39,6 +41,7 @@ const showButtons = () => {
     const controls = document.getElementById("tools-panel-token");
     controls.appendChild(li);
     }
+    buttonsCreated = true;
 }
 
 Hooks.on("init", () => {
