@@ -1,5 +1,7 @@
 # Next up
 
+# v 0.0.4
+
 - Config displayHPValue added
 
 # v 0.0.3
