@@ -19,8 +19,8 @@ const changelogBlob = version.split('.').join(''); // e.g., "002"
         manifest: `https://github.com/${owner}/${repo}/releases/download/${version}/module.json`,
         notes: `https://github.com/${owner}/${repo}/blob/main/CHANGELOG.md#v-${changelogBlob}`,
         compatibility: {
-          minimum: "12",
-          verified: "12",
+          minimum: "14",
+          verified: "14",
           maximum: ""
         }
       }
