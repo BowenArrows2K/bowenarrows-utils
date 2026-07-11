@@ -1,10 +1,9 @@
 # Next up
 
-## v 1.0.1
-
 ### Fixed
 
 - Bug where rounding would not use the highest denomination
+- Swapped currency spender app icon to reduce confusion for Manage Currency from character sheet
 
 ## v 1.0.0
 
