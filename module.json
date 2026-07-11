@@ -8,9 +8,9 @@
       "discord": "bowenarrows"
     }
   ],
-  "version": "1.0.0",
-  "download": "https://github.com/BowenArrows2K/bowenarrows-utils/releases/download/1.0.0/bowenarrows-utils.zip",
-  "manifest": "https://github.com/BowenArrows2K/bowenarrows-utils/releases/download/1.0.0/module.json",
+  "version": "1.0.1",
+  "download": "https://github.com/BowenArrows2K/bowenarrows-utils/releases/download/1.0.1/bowenarrows-utils.zip",
+  "manifest": "https://github.com/BowenArrows2K/bowenarrows-utils/releases/download/1.0.1/module.json",
   "url": "https://github.com/BowenArrows2K/bowenarrows-utils",
   "readme": "https://github.com/BowenArrows2K/bowenarrows-utils/blob/main/README.md",
   "compatibility": {
