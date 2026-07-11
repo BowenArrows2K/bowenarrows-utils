@@ -143,6 +143,7 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
       }
     } else {
       const convList = conversionList
+      convList[commonTypes.max] = ""
       const roundedCost = structuredClone(purchaseValue);
       for (const [type, conv] of Object.entries(convList)) {
         var valueTypes = coinTypes.toReversed();
