@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "C:/Program Files/Foundry Virtual Tabletop/resources/app",
+			"name": "Foundry App"
+		},
+		{
+			"path": "../..",
+			"name": "Foundry Data"
+		},
+		{
+			"path": "."
+		}		
+	],
+	"settings": {}
+}

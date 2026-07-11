@@ -1,19 +1,8 @@
 import PartyMembersApp from "./party-list.js";
 import CurrencySpenderApp from "./currency-calc.js";
 
-let currentCurrencyApp = null;
-let currentPartyApp = null;
-
-function toggleApp(app, appType) {
-    if (app?.rendered) {
-        app.close();
-        return null;
-    } else {
-        app = new appType();
-        app.render(true);
-        return app;
-    }
-}
+let spenderInstance = null;
+let partyListInstance = null;
 
 /**
  * Registers settings for the BowenArrows-Utils module.
@@ -48,41 +37,13 @@ const registerSettings = () => {
     })
 }
 
-/**
- * Show buttons for the Currency Spender and Party List apps in the game
- * toolbar if the corresponding settings are enabled.
- *
- * @function
- */
-const showButtons = () => {
-    const buttons = [
-    {
-        id: 'currency-spender-button',
-        enabled: game.settings.get("bowenarrows-utils", "playerCurrencyApp"),
-        dataTooltip: 'Currency Spender',
-        icon: 'fa-coins',
-        onclick: () => currentCurrencyApp = toggleApp(currentCurrencyApp, CurrencySpenderApp)
-    },
-    {
-        id: 'party-list-button',
-        enabled: game.settings.get("bowenarrows-utils", "playerPartyApp"),
-        dataTooltip: 'Party List',
-        icon: 'fa-users',
-        onclick: () => currentPartyApp =toggleApp(currentPartyApp, PartyMembersApp)
-    }
-    ];
-    for (const button of buttons) {
-    if (document.getElementById(button.id)) continue;
-    if (!button.enabled && !game.user.isGM) continue;
-    const li = document.createElement('li');
-    li.id = button.id;
-    li.setAttribute('data-tooltip', button.dataTooltip);
-    li.setAttribute('aria-label', `Show ${button.dataTooltip}`);
-    li.setAttribute('data-tool', button.dataTooltip.replace(' ', ''));
-    li.innerHTML = `<i class="fas ${button.icon}"></i>`;
-    li.onclick = button.onclick;
-    const controls = document.getElementById("tools-panel-token");
-    controls.appendChild(li);
+const appAPI = {
+    Open(app, appType){
+        if (!app) {
+            app = new appType()
+        }
+        app.render(true)
+        return app
     }
 }
 
@@ -93,6 +54,23 @@ Hooks.on("init", () => {
 });
 Hooks.on("ready", () => {
     console.log("BowenArrow's Utils Ready!");
-    showButtons();
 });
-Hooks.on("renderSceneControls", () => showButtons());
+Hooks.on("getSceneControlButtons", (controls) => {
+    const tokenControl = controls.tokens
+    if (tokenControl) {
+        tokenControl.tools.spender = {
+            name: "spender",
+            title: "Currency Spender",
+            icon: "fa-solid fa-coins",
+            button: true,
+            onChange: () => appAPI.Open(spenderInstance, CurrencySpenderApp)
+        };
+        tokenControl.tools.partylist = {
+            name: "partylist",
+            title: "Party List",
+            icon: "fa-solid fa-users",
+            button: true,
+            onChange: () => appAPI.Open(partyListInstance, PartyMembersApp)
+        }
+    }
+});

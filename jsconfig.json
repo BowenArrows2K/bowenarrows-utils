@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "CommonJS"
+    },
+    "include": [
+        "scripts/**/*",
+        "C:/Program Files/Foundry Virtual Tabletop/resources/app/**/*/*"
+    ]
+}

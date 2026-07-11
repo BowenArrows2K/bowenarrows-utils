@@ -24,7 +24,7 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
     
     const dynamicTitle = {
       window: {
-        title: `${game.user.isGM ? "GM's Currency" : `${game.user.character.name ? game.user.character.name+`'s` : ""}`} Spender`
+        title: `${game.user.isGM ? "GM's Currency" : `${game.user.character?.name ? game.user.character.name+`'s` : game.user.name+`'s`}`} Spender`
       }
     }
 
@@ -34,33 +34,101 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
 
   async #getData(actor = game.user.character) {
     if (!actor) return {};
-    const currency = actor.system?.currency ?? { cp: 0, sp: 0, gp: 0, pp: 0 };
-    const totalGPValue = (currency.cp / 100 + currency.sp / 10 + currency.gp + currency.pp * 10).toFixed(2);
-    return { currency, totalGPValue };
+    const conversions = this.getConversions();
+    const currencyDefinitions = this.currencyDefinitions();
+    const wallet = actor.system?.currency ?? {};
+    if (wallet == {}) {
+      Object.keys(currencyDefinitions.coinValues).forEach(currency => {
+        wallet[currency] = 0;
+      })
+    }
+    const totalGPValue = this.getTotalBaseCoin(wallet, conversions);
+    return { wallet, totalGPValue };
+  }
+
+  getTotalBaseCoin(wallet, conversions) {
+      let totalBaseCoins = 0;
+
+      for (const coin in wallet) {
+        if (conversions[coin] !== undefined) {
+          totalBaseCoins += wallet[coin] / conversions[coin]
+        }
+      }
+
+      return totalBaseCoins.toFixed(2);
+    }
+
+  getConversions() {
+    const conversions = {}
+    const systemCurrencies = game.system.config.currencies
+    Object.keys(systemCurrencies).forEach(currency => {
+      conversions[currency] = systemCurrencies[currency].conversion
+    });
+    return conversions;
+  }
+
+  currencyDefinitions() {
+    const conversions = this.getConversions();
+    const currencyDefinitions = {};
+    const maxVal = Math.max(...Object.values(conversions));
+    currencyDefinitions.commonTypes = {};
+    currencyDefinitions.coinValues = Object.keys(conversions).reduce((result, key) => {
+      result[key] = 1 / (conversions[key] / maxVal);
+      switch (conversions[key]) {
+        case 1:
+          currencyDefinitions.commonTypes.base = key
+        case maxVal:
+          currencyDefinitions.commonTypes.min = key
+      }
+      return result;
+    }, {});
+    currencyDefinitions.commonTypes.max = Object.keys(currencyDefinitions.coinValues).reduce((a, b) => currencyDefinitions.coinValues[a] > currencyDefinitions.coinValues[b] ? a : b);
+    currencyDefinitions.coinTypes = Object.keys(currencyDefinitions.coinValues)
+    currencyDefinitions.sortedCoins = Object.entries(currencyDefinitions.coinValues).sort((a, b) => a[1] - b[1]);
+    currencyDefinitions.conversionList = currencyDefinitions.sortedCoins.reduce((result, [coin], index, array) => {
+      if (index < array.length -1) {
+        result[coin] = array[index + 1][0];
+      }
+      return result;
+    }, {});
+    return currencyDefinitions;
   }
 
   #calculatePayment(html, amount, currency, source) {
-    const values = { pp: 1000, gp: 100, sp: 10, cp: 1 };
+    const currencyDefinitions = this.currencyDefinitions();
+    const commonTypes = currencyDefinitions.commonTypes;
+    const coinValues = currencyDefinitions.coinValues;
+    const coinTypes = currencyDefinitions.coinTypes;
+    const conversionList = currencyDefinitions.conversionList;
     const wallet = foundry.utils.deepClone(currency);
     const coinType = html.querySelector("#currency-spender-denom-select option:checked").textContent;
     const coinToGold = html.querySelector("#currency-spender-denom-select").value*amount;
-    const totalCopper = Math.round(coinToGold * 100);
-    const paid = { pp: 0, gp: 0, sp: 0, cp: 0 };
-    const change = { gp: 0, sp: 0, cp: 0 };
+    const totalMinType = Math.round(coinToGold * coinValues[commonTypes.base]);
+    const paid = {};
+    const change = {};
     const ideal = {};
-    const purchaseValue = { pp: 0, gp: 0, sp: 0, cp: 0 };
-    let paidCopper = 0;
-    let remaining = totalCopper;
-    let pvremaining = totalCopper;
+    const purchaseValue = {};
+    const PVformatted = {}
+    Object.keys(coinValues).forEach(currency => {
+      if (currency !== commonTypes.max) {
+        change[currency] = 0;
+        PVformatted[currency] = 0;
+      }
+      paid[currency] = 0;
+      purchaseValue[currency] = 0;
+    });
+    let paidMinType = 0;
+    let remaining = totalMinType;
+    let pvremaining = totalMinType;
 
     // purchaseValue distribution
-    for (const [type, value] of Object.entries(values).sort((a, b) => b[1] - a[1])) {
-      purchaseValue[type] = type === "cp" ? pvremaining : Math.floor(pvremaining / value);
+    for (const [type, value] of Object.entries(coinValues).sort((a, b) => b[1] - a[1])) {
+      purchaseValue[type] = type === commonTypes.min ? pvremaining : Math.floor(pvremaining / value);
       pvremaining -= purchaseValue[type] * value;
     }
 
     // Ideal distribution
-    for (const [type, value] of Object.entries(values).sort((a, b) => b[1] - a[1])) {
+    for (const [type, value] of Object.entries(coinValues).sort((a, b) => b[1] - a[1])) {
       ideal[type] = Math.min(Math.floor(remaining / value), wallet[type]);
       remaining -= ideal[type] * value;
     }
@@ -68,22 +136,22 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
     const hasExact = remaining === 0;
 
     if (hasExact) {
-      for (let type of ["pp", "gp", "sp", "cp"]) {
+      for (let type of coinTypes) {
         paid[type] = ideal[type];
-        paidCopper += values[type] * ideal[type];
+        paidMinType += coinValues[type] * ideal[type];
         wallet[type] -= ideal[type];
       }
     } else {
-      const convList = {cp: "sp", sp: "gp", gp: "pp", pp: ""}
-      const roundedCost = deepClone(purchaseValue);
+      const convList = conversionList
+      const roundedCost = structuredClone(purchaseValue);
       for (const [type, conv] of Object.entries(convList)) {
-        var valueTypes = ["cp", "sp", "gp", "pp"];
+        var valueTypes = coinTypes.toReversed();
         if (roundedCost[type] === 0) continue;
         if (roundedCost[type] > wallet[type]) {
-          if (type === "pp") {
+          if (type === commonTypes.max) {
             for (let type of valueTypes) {
               paid[type] = wallet[type];
-              paidCopper += values[type] * wallet[type];
+              paidMinType += coinValues[type] * wallet[type];
               wallet[type] -= wallet[type];
             }
             break;
@@ -98,14 +166,14 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
           }
         }
         paid[type] = roundedCost[type];
-        paidCopper += values[type] * roundedCost[type];
+        paidMinType += coinValues[type] * roundedCost[type];
         wallet[type] -= roundedCost[type];
       };
 
-      if (paidCopper < totalCopper) {
-        let short = totalCopper - paidCopper;
+      if (paidMinType < totalMinType) {
+        let short = remaining;
         const shortParts = [];
-        for (const [type, value] of Object.entries(values).sort((a, b) => b[1] - a[1])) {
+        for (const [type, value] of Object.entries(coinValues).sort((a, b) => b[1] - a[1])) {
           const missing = Math.floor(short / value);
           short -= missing * value;
           if (missing > 0) shortParts.push(`<strong style="color: darkred;">${missing}</strong> ${type}`);
@@ -125,9 +193,9 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
       }
 
       // Change
-      let extra = paidCopper - totalCopper;
-      for (let type of ["gp", "sp", "cp"]) {
-        const value = values[type];
+      let extra = paidMinType - totalMinType;
+      for (let type of Object.keys(change)) {
+        const value = coinValues[type];
         change[type] = Math.floor(extra / value);
         wallet[type] += change[type];
         extra %= value;
@@ -143,10 +211,9 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
       ? Object.entries(change).filter(([, v]) => v > 0).map(([k, v]) => `${v} ${k}`).join(", ")
       : "No change returned.";
 
-    const PVformatted = { gp: 0, sp: 0, cp: 0 };
-    for (let type of ["pp", "gp", "sp", "cp"]) {
-      if (type === "pp") {
-        PVformatted["gp"] += purchaseValue[type] * 10 ?? 0;
+    for (let type of coinTypes) {
+      if (type === commonTypes.max) {
+        PVformatted[commonTypes.base] += (purchaseValue[type] * coinValues[type])/coinValues[commonTypes.base] ?? 0;
       } else {
         PVformatted[type] += purchaseValue[type] ?? 0;
       };
@@ -190,14 +257,14 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
       paid,
       change,
       wallet,
-      paidCopper,
+      paidCopper: paidMinType,
       hasExact,
       messageHTML: baseMessage
     };
   }
 
   async #handleSpendGold(html) {
-    const actor = game.user.isGM ? game.actors.get(html.querySelector("#currency-spender-character-select")?.value) : game.user.character;
+    const actor = game.user.character ? game.user.character : game.actors.get(html.querySelector("#currency-spender-character-select")?.value);
     if (!actor) return ui.notifications.warn("You must have a linked character.");
 
     const amount = parseFloat(html.querySelector("#gold-amount")?.value);
@@ -218,20 +285,24 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
 
     ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor }),
-      content: fullMessage,
-      type: CONST.CHAT_MESSAGE_TYPES.OTHER
+      content: fullMessage
     });
 
     this.close();
   }
 
   async #updateCurrencySpender(html, actor) {
+    const conversions = this.getConversions();
     const status = html.querySelector("#currency-status");
-    const { currency, totalGPValue } = await this.#getData(actor);
+    const { wallet, totalGPValue } = await this.#getData(actor);
+    const tooltip = new Array();
+    Object.keys(conversions).forEach((currency) => {
+      tooltip.push(wallet[currency] + " " + currency)
+    });
 
     status.innerHTML = `
         <strong>Current Funds:</strong><br />
-        ${currency.pp} pp, ${currency.gp} gp, ${currency.sp} sp, ${currency.cp} cp<br />
+        ${tooltip.join(", ")}<br />
         <strong>Total GP Value:</strong> ${totalGPValue} gp
     `;
   }
@@ -251,13 +322,13 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
 
   async _renderHTML() {
     const members = game.actors.filter(actor =>
-      actor.hasPlayerOwner &&
+      game.user.isGM ? actor.hasPlayerOwner : game.user._id in actor.ownership &&
       actor.type === "character" &&
       !actor.name.toLowerCase().includes("spectator") &&
       !actor.name.toLowerCase().includes("map")
     );
     
-    const actor = game.user.isGM === true ? members[0] : game.user.character;
+    const actor = game.user.isGM === true ? members[0] : game.user.character ? game.user.character : members[0];
     const { currency, totalGPValue } = await this.#getData(actor);
     if (!actor) return document.createElement("div");
     
@@ -268,9 +339,14 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
     charSelect.innerHTML = charOptions;
 
     const denomSelect = document.createElement("select");
-    const denomValue = { pp: 10, gp: 1, sp: 0.1, cp: 0.01 };
+    // const denomValue = { pp: 10, gp: 1, sp: 0.1, cp: 0.01 };
+    const conversions = this.getConversions();
+    const denomValue = Object.keys(conversions).reduce((result, key) => {
+      result[key] = 1 / conversions[key];
+      return result;
+    }, {});
     const denomOptions = Object.entries(denomValue).map(([k, v]) => {
-      if (k === "gp") {
+      if (v === 1) {
         return `<option value=${v} selected>${k}</option>`;
       } else {
         return `<option value=${v}>${k}</option>`;
@@ -287,7 +363,7 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
     const body = document.createElement("div");
     body.id = "currency-spender-body";
     body.innerHTML = `
-      ${game.user.isGM ? charSelect.outerHTML : ""}
+      ${(game.user.isGM | !game.user.character?.name) ? charSelect.outerHTML : ""}
       <div class="amount-input">
         <label style="white-space: nowrap;">Amount to Spend:</label>
         <input type="number" id="gold-amount" min="0" step="0.01" />
@@ -312,7 +388,7 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
       debounce = setTimeout(() => this.#updatePreview(container), 150);
     });
 
-    if (game.user.isGM) {
+    if (game.user.isGM | !game.user.character) {
       container.querySelector("#currency-spender-character-select").addEventListener("change", (event) => {
         const selectedValue = event.target.value;
         const actor = game.actors.get(selectedValue);

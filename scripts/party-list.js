@@ -84,7 +84,13 @@ export default class PartyMembersApp extends foundry.applications.api.Applicatio
       const classes = member.items.filter(i => i.type === "class").map(cls => `${cls.name} (${cls.system.levels})`).join(", ");
       const background = member.system.details.background;
       const currencies = member.system.currency;
-      const totalMemberGP = (currencies.pp * 10) + currencies.gp + (currencies.ep / 2) + (currencies.sp / 10) + (currencies.cp / 100);
+      const systemcurrencies = game.system.config.currencies;
+      let totalMemberGP = 0;
+      const tooltip = new Array();
+      Object.keys(systemcurrencies).forEach((currency) => {
+        totalMemberGP += Number(currencies[currency]) / Number(systemcurrencies[currency].conversion)
+        tooltip.push(systemcurrencies[currency].abbreviation.toUpperCase() + ":" + currencies[currency])
+      });
       totalGP += totalMemberGP;
       const gpFormatted = totalMemberGP.toFixed(2);
       
@@ -106,7 +112,7 @@ export default class PartyMembersApp extends foundry.applications.api.Applicatio
           <td><span class="clickable-name" data-actor-id="${member.id}">${member.name}</span></td>
           <td class="clickable-inspiration" data-actor-id="${member.id}">${inspiration}</td>
           <td>${classes}</td>
-          <td>${background.name}</td>
+          <td>${background?.name ?? "null"}</td>
           <td>
             <div class="health-container" style="min-width: ${(textWidth * 2)}px;">
               <div class="healthbar" style="background: ${barGradient};"></div>
@@ -115,7 +121,7 @@ export default class PartyMembersApp extends foundry.applications.api.Applicatio
           </td>
           <td>${ac}</td>
           <td>${passive}</td>
-          <td title="PP: ${currencies.pp}, GP: ${currencies.gp}, EP: ${currencies.ep}, SP: ${currencies.sp}, CP: ${currencies.cp}">
+          <td title="${tooltip.join(", ")}">
             ${gpFormatted} gp
           </td>
         </tr>
