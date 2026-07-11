@@ -8,14 +8,14 @@
       "discord": "bowenarrows"
     }
   ],
-  "version": "0.0.6",
-  "download": "https://github.com/BowenArrows2K/bowenarrows-utils/releases/download/0.0.6/bowenarrows-utils.zip",
-  "manifest": "https://github.com/BowenArrows2K/bowenarrows-utils/releases/latest/download/module.json",
+  "version": "1.0.0",
+  "download": "https://github.com/BowenArrows2K/bowenarrows-utils/releases/download/1.0.0/bowenarrows-utils.zip",
+  "manifest": "https://github.com/BowenArrows2K/bowenarrows-utils/releases/download/1.0.0/module.json",
   "url": "https://github.com/BowenArrows2K/bowenarrows-utils",
   "readme": "https://github.com/BowenArrows2K/bowenarrows-utils/blob/main/README.md",
   "compatibility": {
-    "minimum": "12",
-    "verified": "12"
+    "minimum": "14",
+    "verified": "14"
   },
   "esmodules": ["scripts/main.js", "scripts/universal-listener.js"],
   "styles": ["styles/bowenarrows-utils.css"],
@@ -26,8 +26,8 @@
         "id": "dnd5e",
         "type": "system",
         "compatibility": {
-          "minimum": "4.3.7",
-          "verified": "4.3.7"
+          "minimum": "5.3.3",
+          "verified": "5.3.3"
         }
       }
     ]
