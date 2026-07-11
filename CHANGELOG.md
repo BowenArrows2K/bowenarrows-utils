@@ -1,5 +1,7 @@
 # Next up
 
+- Swapped currency spender app icon to reduce confusion for Manage Currency from character sheet
+
 # v 0.0.6
 
 - Moved styles to styles/*

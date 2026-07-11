@@ -6,7 +6,7 @@ export default class CurrencySpenderApp extends foundry.applications.api.Applica
     actions: {},
     position: { width: 400, height: "auto" },
     window: {
-      icon: "fas fa-coins",
+      icon: "fas fa-coin",
       title: "Currency Spender",
       popOut: true,
       resizable: true,

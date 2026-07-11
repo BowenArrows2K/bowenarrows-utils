@@ -61,7 +61,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
         tokenControl.tools.spender = {
             name: "spender",
             title: "Currency Spender",
-            icon: "fa-solid fa-coins",
+            icon: "fa-solid fa-coin",
             button: true,
             onChange: () => appAPI.Open(spenderInstance, CurrencySpenderApp)
         };
